@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "alert-api-collection-123",
 		"name": "KairosPulse-Alert-API",
-		"description": "Complete API collection for KairosPulse Alert system with 3 endpoints:\n\n1. GET /api/alerts - Get all alerts with pagination\n2. POST /api/alerts - Create new alert nodes (always adds new, never replaces)\n3. GET /api/alerts/latest - Get only the most recent alert\n\nSaves to MongoDB collection 'KairosPulse-Tracking' in 'kairosdb' database.\n\nEach POST creates a new document/node with unique nodeId and MongoDB ObjectId.",
+		"description": "Complete API collection for KairosPulse system with 5 endpoints:\n\n📊 ALERT APIs:\n1. GET /api/alerts - Get all alerts with pagination\n2. POST /api/alerts - Create new alert nodes (always adds new, never replaces)\n3. GET /api/alerts/latest - Get only the most recent alert\n\n📁 EXCEL APIs:\n4. POST /api/upload-excel - Upload and replace Excel dashboard file\n5. GET /api/upload-excel - Get current Excel file information\n\nAlert data saves to MongoDB collection 'KairosPulse-Tracking' in 'kairosdb' database.\nExcel file always saved as 'Koyfin Dashboard and PA nbs Execution Details_Latest 1 - SriniK.xlsx'.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -179,6 +179,123 @@
 					],
 					"cookie": [],
 					"body": "{\n  \"success\": true,\n  \"data\": {\n    \"_id\": \"507f1f77bcf86cd799439011\",\n    \"alertType\": \"system\",\n    \"message\": \"Latest alert message\",\n    \"severity\": \"high\",\n    \"createdAt\": \"2025-11-11T11:30:00.000Z\",\n    \"updatedAt\": \"2025-11-11T11:30:00.000Z\"\n  },\n  \"message\": \"Latest alert retrieved successfully\"\n}"
+				}
+			]
+		},
+		{
+			"name": "Upload Excel File",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "excel",
+							"type": "file",
+							"src": [],
+							"description": "Excel file to upload (.xlsx or .xls)"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/upload-excel",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"upload-excel"
+					]
+				},
+				"description": "Upload and replace the Excel file 'Koyfin Dashboard and PA nbs Execution Details_Latest 1 - SriniK.xlsx' in src/components/"
+			},
+			"response": [
+				{
+					"name": "Success Response",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "excel",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/upload-excel",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"upload-excel"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"body": "{\n  \"success\": true,\n  \"message\": \"Excel file uploaded and replaced successfully\",\n  \"fileInfo\": {\n    \"originalName\": \"my-dashboard.xlsx\",\n    \"savedAs\": \"Koyfin Dashboard and PA nbs Execution Details_Latest 1 - SriniK.xlsx\",\n    \"path\": \"/path/to/src/components/Koyfin Dashboard and PA nbs Execution Details_Latest 1 - SriniK.xlsx\",\n    \"size\": 1024000,\n    \"type\": \"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet\",\n    \"uploadedAt\": \"2025-11-11T12:30:00.000Z\"\n  }\n}"
+				}
+			]
+		},
+		{
+			"name": "Get Excel File Info",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/upload-excel",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"upload-excel"
+					]
+				},
+				"description": "Get information about the current Excel file"
+			},
+			"response": [
+				{
+					"name": "File Exists Response",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/upload-excel",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"upload-excel"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"body": "{\n  \"success\": true,\n  \"exists\": true,\n  \"fileInfo\": {\n    \"name\": \"Koyfin Dashboard and PA nbs Execution Details_Latest 1 - SriniK.xlsx\",\n    \"path\": \"/path/to/src/components/Koyfin Dashboard and PA nbs Execution Details_Latest 1 - SriniK.xlsx\",\n    \"size\": 1024000,\n    \"lastModified\": \"2025-11-11T12:30:00.000Z\",\n    \"created\": \"2025-11-11T10:00:00.000Z\"\n  }\n}"
 				}
 			]
 		}
