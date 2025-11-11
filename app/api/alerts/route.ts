@@ -67,20 +67,35 @@ export async function POST(request: NextRequest) {
     console.log('POST - Collection name:', COLLECTION_NAME);
     console.log('POST - Full collection namespace:', `${db.databaseName}.${COLLECTION_NAME}`);
 
-    // Add metadata to the alert document
+    // Create a new document/node - always insert, never replace
     const alertDocument = {
       ...body,
+      _id: undefined, // Ensure MongoDB generates a new ObjectId
       createdAt: new Date(),
       updatedAt: new Date(),
+      nodeId: new Date().getTime(), // Add unique node identifier
     };
 
+    // Remove any existing _id from the request body to prevent conflicts
+    delete alertDocument._id;
+
+    console.log('Creating new alert node:', { nodeId: alertDocument.nodeId });
+
+    // Insert as a new document (creates new node, never replaces)
     const result = await collection.insertOne(alertDocument);
     const savedAlert = await collection.findOne({ _id: result.insertedId });
+
+    console.log('New alert node created with ID:', result.insertedId);
 
     return NextResponse.json({
       success: true,
       data: savedAlert,
-      message: 'Alert saved successfully'
+      message: 'New alert node created successfully',
+      nodeInfo: {
+        mongoId: result.insertedId,
+        nodeId: alertDocument.nodeId,
+        createdAt: alertDocument.createdAt
+      }
     }, { status: 201 });
   } catch (error) {
     console.error('Error saving alert:', error);
