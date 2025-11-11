@@ -3,9 +3,15 @@ import { MongoClient, Db } from 'mongodb';
 let client: MongoClient;
 let clientPromise: Promise<MongoClient> | null = null;
 
+// Reset any cached connections to ensure fresh connection
+clientPromise = null;
+
 function getClientPromise(): Promise<MongoClient> {
-  // Production MongoDB URI
-  const uri = process.env.MONGODB_URI || 'mongodb://kairos_admin:Sears234%23@lc-sywrelay-kairos-mongo-prod-825d03041ac5a48a.elb.us-east-2.amazonaws.com:27017/?authMechanism=SCRAM-SHA-1&authSource=kairosdb&readPreference=primaryPreferred&directConnection=true';
+  // Force production MongoDB URI - ignore environment variables for now
+  const uri = 'mongodb://kairos_admin:Sears234%23@lc-sywrelay-kairos-mongo-prod-825d03041ac5a48a.elb.us-east-2.amazonaws.com:27017/?authMechanism=SCRAM-SHA-1&authSource=kairosdb&readPreference=primaryPreferred&directConnection=true';
+  
+  console.log('MongoDB URI being used:', uri);
+  console.log('Environment MONGODB_URI:', process.env.MONGODB_URI);
 
   if (clientPromise) {
     return clientPromise;
