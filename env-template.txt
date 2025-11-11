@@ -1,0 +1,12 @@
+# Environment Variables Template
+# Copy this to .env.local and update with your values
+
+# MongoDB Connection URI
+# For local MongoDB:
+MONGODB_URI=mongodb://localhost:27017
+
+# For MongoDB Atlas (replace with your credentials):
+# MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net
+
+# Next.js Environment
+NODE_ENV=development

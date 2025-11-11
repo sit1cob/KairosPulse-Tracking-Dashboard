@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDatabase } from '@/lib/mongodb';
 
-const COLLECTION_NAME = 'kairos-pulse-alert';
+const COLLECTION_NAME = 'KairosPulse-Tracking';
 
 // GET /api/alerts - Get all alerts
 export async function GET(request: NextRequest) {
@@ -12,6 +12,13 @@ export async function GET(request: NextRequest) {
 
     const db = await getDatabase();
     const collection = db.collection(COLLECTION_NAME);
+    
+    // Debug logging
+    const mongoUrl = process.env.MONGODB_URI || 'mongodb://kairos_admin:Sears234%23@lc-sywrelay-kairos-mongo-prod-825d03041ac5a48a.elb.us-east-2.amazonaws.com:27017/?authMechanism=SCRAM-SHA-1&authSource=kairosdb&readPreference=primaryPreferred&directConnection=true';
+    console.log('MongoDB URL:', mongoUrl);
+    console.log('Database name:', db.databaseName);
+    console.log('Collection name:', COLLECTION_NAME);
+    console.log('Full collection namespace:', `${db.databaseName}.${COLLECTION_NAME}`);
 
     const alerts = await collection
       .find({})
@@ -52,6 +59,13 @@ export async function POST(request: NextRequest) {
 
     const db = await getDatabase();
     const collection = db.collection(COLLECTION_NAME);
+
+    // Debug logging
+    const mongoUrl = process.env.MONGODB_URI || 'mongodb://kairos_admin:Sears234%23@lc-sywrelay-kairos-mongo-prod-825d03041ac5a48a.elb.us-east-2.amazonaws.com:27017/?authMechanism=SCRAM-SHA-1&authSource=kairosdb&readPreference=primaryPreferred&directConnection=true';
+    console.log('POST - MongoDB URL:', mongoUrl);
+    console.log('POST - Database name:', db.databaseName);
+    console.log('POST - Collection name:', COLLECTION_NAME);
+    console.log('POST - Full collection namespace:', `${db.databaseName}.${COLLECTION_NAME}`);
 
     // Add metadata to the alert document
     const alertDocument = {
