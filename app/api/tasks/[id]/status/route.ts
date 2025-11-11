@@ -6,10 +6,10 @@ import { ObjectId } from 'mongodb';
 // POST /api/tasks/[id]/status - Add a new status entry to a task
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
 
     if (!validateStatusEntry(body)) {
@@ -82,10 +82,10 @@ export async function POST(
 // PUT /api/tasks/[id]/status - Update the latest status
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
 
     if (!validateStatusEntry(body)) {

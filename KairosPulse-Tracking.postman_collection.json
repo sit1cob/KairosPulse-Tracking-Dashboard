@@ -1,0 +1,495 @@
+{
+	"info": {
+		"_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+		"name": "KairosPulse-Tracking",
+		"description": "API collection for KairosPulse Tracking Dashboard - MongoDB REST API endpoints for managing tasks, collections, and status updates.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "12345678"
+	},
+	"item": [
+		{
+			"name": "Tasks API",
+			"item": [
+				{
+					"name": "Get All Tasks",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/tasks?limit=10&skip=0",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tasks"
+							],
+							"query": [
+								{
+									"key": "sheetKey",
+									"value": "foundational",
+									"description": "Filter by sheet type (foundational or koyfinScripts)",
+									"disabled": true
+								},
+								{
+									"key": "poc",
+									"value": "Data Team",
+									"description": "Filter by Point of Contact",
+									"disabled": true
+								},
+								{
+									"key": "status",
+									"value": "Pass",
+									"description": "Filter by status",
+									"disabled": true
+								},
+								{
+									"key": "limit",
+									"value": "10",
+									"description": "Number of results to return"
+								},
+								{
+									"key": "skip",
+									"value": "0",
+									"description": "Number of results to skip"
+								}
+							]
+						},
+						"description": "Retrieve all tasks with optional filtering and pagination"
+					},
+					"response": []
+				},
+				{
+					"name": "Create New Task",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": \"foundational-new-task\",\n  \"notebook\": \"New Data Processing Task\",\n  \"bucket\": \"Data Processing\",\n  \"automationStatus\": \"Automated\",\n  \"schedule\": \"Daily at 8 AM\",\n  \"estimatedRunTime\": \"30 minutes\",\n  \"days\": \"Monday to Friday\",\n  \"poc\": \"Data Team\",\n  \"statuses\": [],\n  \"latestStatus\": null,\n  \"todayStatus\": null,\n  \"sheetKey\": \"foundational\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/tasks",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tasks"
+							]
+						},
+						"description": "Create a new task record"
+					},
+					"response": []
+				},
+				{
+					"name": "Bulk Update Tasks",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"tasks\": [\n    {\n      \"id\": \"foundational-bulk-1\",\n      \"notebook\": \"Bulk Updated Task 1\",\n      \"bucket\": \"ETL\",\n      \"automationStatus\": \"Automated\",\n      \"schedule\": \"Daily\",\n      \"estimatedRunTime\": \"20 minutes\",\n      \"days\": \"Monday to Friday\",\n      \"poc\": \"ETL Team\",\n      \"statuses\": [],\n      \"latestStatus\": null,\n      \"todayStatus\": null,\n      \"sheetKey\": \"foundational\"\n    },\n    {\n      \"id\": \"koyfinScripts-bulk-2\",\n      \"notebook\": \"Bulk Updated Task 2\",\n      \"bucket\": \"Market Data\",\n      \"automationStatus\": \"Manual\",\n      \"schedule\": \"Weekly\",\n      \"estimatedRunTime\": \"45 minutes\",\n      \"days\": \"Monday\",\n      \"poc\": \"Market Team\",\n      \"statuses\": [],\n      \"latestStatus\": null,\n      \"todayStatus\": null,\n      \"sheetKey\": \"koyfinScripts\"\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/tasks",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tasks"
+							]
+						},
+						"description": "Bulk create or update multiple tasks"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Task by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/tasks/{{taskId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tasks",
+								"{{taskId}}"
+							]
+						},
+						"description": "Get a specific task by ID (MongoDB _id or custom id field)"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Task",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": \"foundational-updated-task\",\n  \"notebook\": \"Updated Task Notebook\",\n  \"bucket\": \"Updated Bucket\",\n  \"automationStatus\": \"Manual\",\n  \"schedule\": \"Weekly\",\n  \"estimatedRunTime\": \"1 hour\",\n  \"days\": \"Wednesday\",\n  \"poc\": \"Updated Team\",\n  \"statuses\": [],\n  \"latestStatus\": {\n    \"label\": \"Nov 11\",\n    \"status\": \"Pass\",\n    \"remarks\": \"Updated successfully\"\n  },\n  \"todayStatus\": null,\n  \"sheetKey\": \"foundational\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/tasks/{{taskId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tasks",
+								"{{taskId}}"
+							]
+						},
+						"description": "Update a complete task record"
+					},
+					"response": []
+				},
+				{
+					"name": "Partial Update Task",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"latestStatus\": {\n    \"label\": \"Nov 11\",\n    \"status\": \"Pass\",\n    \"remarks\": \"Partial update - status changed\"\n  },\n  \"automationStatus\": \"Automated\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/tasks/{{taskId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tasks",
+								"{{taskId}}"
+							]
+						},
+						"description": "Partially update a task (only provided fields)"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Task",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/tasks/{{taskId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tasks",
+								"{{taskId}}"
+							]
+						},
+						"description": "Delete a specific task"
+					},
+					"response": []
+				}
+			],
+			"description": "CRUD operations for task management"
+		},
+		{
+			"name": "Status Management API",
+			"item": [
+				{
+					"name": "Add Status Entry",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"label\": \"Nov 11\",\n  \"status\": \"Pass\",\n  \"remarks\": \"Task executed successfully with new status entry\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/tasks/{{taskId}}/status",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tasks",
+								"{{taskId}}",
+								"status"
+							]
+						},
+						"description": "Add a new status entry to a task's status history"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Latest Status",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"label\": \"Nov 11\",\n  \"status\": \"Fail\",\n  \"remarks\": \"Updated latest status - encountered error\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/tasks/{{taskId}}/status",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tasks",
+								"{{taskId}}",
+								"status"
+							]
+						},
+						"description": "Update the latest status of a task"
+					},
+					"response": []
+				}
+			],
+			"description": "Status update operations for tasks"
+		},
+		{
+			"name": "Collections API",
+			"item": [
+				{
+					"name": "Get All Collections",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/collections?limit=20&skip=0",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"collections"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "20",
+									"description": "Number of collections to return"
+								},
+								{
+									"key": "skip",
+									"value": "0",
+									"description": "Number of collections to skip"
+								}
+							]
+						},
+						"description": "Get all dashboard collections with pagination"
+					},
+					"response": []
+				},
+				{
+					"name": "Create New Collection",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"New Dashboard Collection\",\n  \"description\": \"A collection of related tasks for monitoring\",\n  \"tasks\": [\n    \"foundational-0-data-pipeline\",\n    \"koyfinScripts-0-market-data-sync\"\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/collections",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"collections"
+							]
+						},
+						"description": "Create a new dashboard collection"
+					},
+					"response": []
+				}
+			],
+			"description": "Dashboard collection management operations"
+		},
+		{
+			"name": "Legacy APIs (Existing)",
+			"item": [
+				{
+					"name": "Get Dashboard Data",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/dashboard",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"dashboard"
+							]
+						},
+						"description": "Get dashboard data from Excel workbook (legacy endpoint)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Status Overrides",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/status-overrides",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"status-overrides"
+							]
+						},
+						"description": "Get current status overrides from JSON file"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Status Overrides",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"foundational-0-cancelsclassificationopenai-dailyupdate-ipynb\": {\n    \"status\": \"Pass\",\n    \"remarks\": \"Override status via API\",\n    \"label\": \"Nov 11\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/status-overrides",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"status-overrides"
+							]
+						},
+						"description": "Update status overrides in JSON file"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Status Override",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/status-overrides?id={{overrideId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"status-overrides"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{overrideId}}",
+									"description": "ID of the status override to delete"
+								}
+							]
+						},
+						"description": "Delete a specific status override"
+					},
+					"response": []
+				}
+			],
+			"description": "Legacy API endpoints for existing functionality"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000",
+			"type": "string",
+			"description": "Base URL for the API (local development)"
+		},
+		{
+			"key": "awsUrl",
+			"value": "http://10.11.8.143:3000",
+			"type": "string",
+			"description": "AWS instance URL"
+		},
+		{
+			"key": "taskId",
+			"value": "foundational-0-data-pipeline",
+			"type": "string",
+			"description": "Sample task ID for testing"
+		},
+		{
+			"key": "overrideId",
+			"value": "foundational-0-cancelsclassificationopenai-dailyupdate-ipynb",
+			"type": "string",
+			"description": "Sample override ID for testing"
+		}
+	]
+}

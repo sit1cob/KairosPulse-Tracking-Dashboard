@@ -1,0 +1,150 @@
+{
+	"info": {
+		"_postman_id": "alert-api-collection-123",
+		"name": "KairosPulse-Alert-API",
+		"description": "Simple API collection for KairosPulse Alert system - Save and retrieve JSON alerts from MongoDB collection 'kairos-pulse-alert'",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get Alerts",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/alerts?limit=50&skip=0",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"alerts"
+					],
+					"query": [
+						{
+							"key": "limit",
+							"value": "50",
+							"description": "Number of alerts to return (default: 100)"
+						},
+						{
+							"key": "skip",
+							"value": "0",
+							"description": "Number of alerts to skip for pagination (default: 0)"
+						}
+					]
+				},
+				"description": "Retrieve all alerts from kairos-pulse-alert collection with pagination"
+			},
+			"response": [
+				{
+					"name": "Success Response",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/alerts",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"alerts"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"_id\": \"507f1f77bcf86cd799439011\",\n      \"alertType\": \"system\",\n      \"message\": \"Sample alert message\",\n      \"severity\": \"high\",\n      \"createdAt\": \"2025-11-11T10:30:00.000Z\",\n      \"updatedAt\": \"2025-11-11T10:30:00.000Z\"\n    }\n  ],\n  \"pagination\": {\n    \"total\": 1,\n    \"limit\": 100,\n    \"skip\": 0,\n    \"hasMore\": false\n  }\n}"
+				}
+			]
+		},
+		{
+			"name": "Save Alert",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"alertType\": \"system\",\n  \"message\": \"Critical system alert - Database connection lost\",\n  \"severity\": \"high\",\n  \"source\": \"database-monitor\",\n  \"metadata\": {\n    \"server\": \"prod-db-01\",\n    \"timestamp\": \"2025-11-11T10:30:00Z\",\n    \"errorCode\": \"DB_CONNECTION_TIMEOUT\"\n  },\n  \"tags\": [\"database\", \"critical\", \"production\"],\n  \"resolved\": false\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/alerts",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"alerts"
+					]
+				},
+				"description": "Save a new alert to kairos-pulse-alert collection. Accepts any JSON structure."
+			},
+			"response": [
+				{
+					"name": "Success Response",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"alertType\": \"system\",\n  \"message\": \"Sample alert\",\n  \"severity\": \"medium\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/alerts",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"alerts"
+							]
+						}
+					},
+					"status": "Created",
+					"code": 201,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"body": "{\n  \"success\": true,\n  \"data\": {\n    \"_id\": \"507f1f77bcf86cd799439011\",\n    \"alertType\": \"system\",\n    \"message\": \"Sample alert\",\n    \"severity\": \"medium\",\n    \"createdAt\": \"2025-11-11T10:30:00.000Z\",\n    \"updatedAt\": \"2025-11-11T10:30:00.000Z\"\n  },\n  \"message\": \"Alert saved successfully\"\n}"
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000",
+			"type": "string",
+			"description": "Base URL for local development"
+		},
+		{
+			"key": "awsUrl",
+			"value": "http://10.11.8.143:3000",
+			"type": "string",
+			"description": "AWS instance URL"
+		}
+	]
+}

@@ -6,10 +6,10 @@ import { ObjectId } from 'mongodb';
 // GET /api/tasks/[id] - Get a specific task
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const db = await getDatabase();
     const collection = db.collection<TaskRecord>(COLLECTIONS.TASKS);
 
@@ -43,10 +43,10 @@ export async function GET(
 // PUT /api/tasks/[id] - Update a specific task
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
 
     if (!validateTaskRecord(body)) {
@@ -98,10 +98,10 @@ export async function PUT(
 // DELETE /api/tasks/[id] - Delete a specific task
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const db = await getDatabase();
     const collection = db.collection<TaskRecord>(COLLECTIONS.TASKS);
 
@@ -135,10 +135,10 @@ export async function DELETE(
 // PATCH /api/tasks/[id] - Partially update a task (e.g., just status)
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
 
     const db = await getDatabase();
