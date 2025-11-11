@@ -205,8 +205,9 @@ function buildRecord({ row, headers, sheetKey, rowIndex, overrides }: BuildRecor
   let todayStatus = findStatusForToday(statuses);
   let latestStatus = selectLatestStatus(statuses, todayStatus);
 
+  // Only apply override if there's no existing todayStatus from Excel
   const override = overrides[id];
-  if (override) {
+  if (override && !todayStatus) {
     const overrideEntry: StatusEntry = {
       label: override.label ?? 'Manual Override',
       status: override.status,
@@ -288,6 +289,7 @@ function selectLatestStatus(statuses: StatusEntry[], todayStatus: StatusEntry | 
 
 function findStatusForToday(statuses: StatusEntry[]): StatusEntry | null {
   const today = new Date();
+  console.log(`🗓️  Looking for today's status: Day=${today.getDate()}, Month=${today.getMonth()} (${today.toDateString()})`);
 
   for (const entry of statuses) {
     if (!entry.label) {
@@ -299,13 +301,17 @@ function findStatusForToday(statuses: StatusEntry[]): StatusEntry | null {
       continue;
     }
 
+    console.log(`🔍 Checking entry: label="${entry.label}", parsed day=${parsed.day}, month=${parsed.month}, matches=${parsed.day === today.getDate() && parsed.month === today.getMonth()}`);
+
     if (parsed.day === today.getDate() && parsed.month === today.getMonth()) {
       if (entry.status.trim().length > 0 || entry.remarks.trim().length > 0) {
+        console.log(`✅ Found today's status: ${entry.status}`);
         return entry;
       }
     }
   }
 
+  console.log(`❌ No status found for today`);
   return null;
 }
 
@@ -480,7 +486,9 @@ function extractSuffix(header: string): string {
 
 function formatStatusLabel(header: string): string {
   const cleaned = header.replace(/_/g, ' ').replace(/\s+/g, ' ').trim();
-  return toTitleCase(cleaned);
+  const result = toTitleCase(cleaned);
+  console.log(`📋 Format Label: "${header}" → "${result}"`);
+  return result;
 }
 
 function toTitleCase(value: string): string {

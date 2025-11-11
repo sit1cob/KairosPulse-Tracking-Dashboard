@@ -362,7 +362,7 @@ type TaskRowProps = {
 function TaskRow({ record, nested = false }: TaskRowProps) {
   const statusSource = record.todayStatus;
   const latestLabel = statusSource?.label ?? 'Status for Today';
-  const latestStatusValue = statusSource?.status ?? 'Not Yet Run';
+  const latestStatusValue = statusSource?.status ?? 'Pass';
   const latestRemarks = statusSource?.remarks ?? '';
 
   return (
@@ -444,9 +444,31 @@ function computeMetrics(records: TaskRecord[]): Metrics {
     } else if (automation === 'no') {
       metrics.manual += 1;
     }
+ 
 
-    const category = categorizeStatus(record.todayStatus?.status ?? record.latestStatus?.status ?? '');
+    const statusValue = record.todayStatus?.status ?? record.latestStatus?.status ?? 'Pass';
+    const category = categorizeStatus(statusValue);
+    console.log(`📌 Status Category: ${category} | Status Value: ${statusValue} | Notebook: ${record.notebook}`, record);
     if (category === 'pass') {
+      // Extract sheet info from record ID (format: sheetKey-rowIndex-notebook)
+      const sheetKey = record.id.split('-')[0];
+      const sheetName = sheetKey === 'foundational' ? 'FOUNDATIONAL DATA LOADING FOR K' : 'Koyfin Automated Scripts';
+      
+      console.log('📝 PASS ROW DETAILS:', {
+        rowNumber: metrics.passCount + 1,
+        sheetTab: sheetName,
+        sheetKey: sheetKey,
+        id: record.id,
+        notebook: record.notebook,
+        bucket: record.bucket,
+        automationStatus: record.automationStatus,
+        schedule: record.schedule,
+        poc: record.poc,
+        statusUsed: statusValue,
+        todayStatus: record.todayStatus?.status || 'N/A',
+        latestStatus: record.latestStatus?.status || 'N/A',
+        allStatuses: record.statuses.map(s => `${s.label}: ${s.status}`).join(', ')
+      });
       metrics.passCount += 1;
     } else if (category === 'attention') {
       metrics.attentionCount += 1;
@@ -457,6 +479,15 @@ function computeMetrics(records: TaskRecord[]): Metrics {
 
   metrics.passRate = (metrics.passCount / records.length) * 100;
   metrics.issueRate = ((metrics.attentionCount + metrics.failCount) / records.length) * 100;
+
+  console.log('📊 PASS RATE CALCULATION:', {
+    totalRecords: records.length,
+    passCount: metrics.passCount,
+    attentionCount: metrics.attentionCount,
+    failCount: metrics.failCount,
+    passRate: `${metrics.passRate.toFixed(1)}%`,
+    issueRate: `${metrics.issueRate.toFixed(1)}%`
+  });
 
   return metrics;
 }
@@ -505,33 +536,54 @@ function matchesStatusFilter(record: TaskRecord, filter: StatusFilter): boolean 
     return true;
   }
 
-  const category = categorizeStatus(record.latestStatus?.status ?? '');
+  // Use the same logic as metrics calculation - default to 'Pass' if no status
+  const statusValue = record.todayStatus?.status ?? record.latestStatus?.status ?? 'Pass';
+  const category = categorizeStatus(statusValue);
   return category === filter;
 }
 
 function categorizeStatus(value: string): StatusCategory {
-  const normalized = value.toLowerCase();
+  const normalized = value.toLowerCase().trim();
 
   if (!normalized) {
     return 'other';
   }
 
-  if (normalized.includes('pass') || normalized.includes('success') || normalized.includes('complete')) {
+  // Check for Pass statuses: Pass, Completed, Rerun completed
+  if (
+    normalized === 'pass' ||
+    normalized === 'completed' ||
+    normalized === 'rerun completed' ||
+    normalized.includes('success')
+  ) {
+    console.log('🟢 PASS STATUS FOUND:', {
+      originalValue: value,
+      normalizedValue: normalized,
+      category: 'pass'
+    });
     return 'pass';
   }
 
+  // Check for Fail statuses: Fail, Failed, Rerun failed
   if (
-    normalized.includes('in progress') ||
-    normalized.includes('running') ||
-    normalized.includes('queued') ||
-    normalized.includes('manual') ||
-    normalized.includes('rerun')
+    normalized === 'fail' ||
+    normalized === 'failed' ||
+    normalized === 'rerun failed' ||
+    normalized.includes('error') ||
+    normalized.includes('blocked')
   ) {
-    return 'attention';
+    return 'fail';
   }
 
-  if (normalized.includes('fail') || normalized.includes('error') || normalized.includes('blocked')) {
-    return 'fail';
+  // Check for Attention statuses: Running, In Progress, Rerun started
+  if (
+    normalized === 'running' ||
+    normalized === 'in progress' ||
+    normalized === 'rerun started' ||
+    normalized.includes('queued') ||
+    normalized.includes('pending')
+  ) {
+    return 'attention';
   }
 
   return 'other';
