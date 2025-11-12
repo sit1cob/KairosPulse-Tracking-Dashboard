@@ -360,9 +360,9 @@ type TaskRowProps = {
 };
 
 function TaskRow({ record, nested = false }: TaskRowProps) {
-  const statusSource = record.todayStatus;
+  const statusSource = record.todayStatus ?? record.latestStatus;
   const latestLabel = statusSource?.label ?? 'Status for Today';
-  const latestStatusValue = statusSource?.status ?? 'Pass';
+  const latestStatusValue = statusSource?.status ?? 'No Status';
   const latestRemarks = statusSource?.remarks ?? '';
 
   return (
@@ -536,8 +536,8 @@ function matchesStatusFilter(record: TaskRecord, filter: StatusFilter): boolean 
     return true;
   }
 
-  // Use the same logic as metrics calculation - default to 'Pass' if no status
-  const statusValue = record.todayStatus?.status ?? record.latestStatus?.status ?? 'Pass';
+  // Use the same logic as metrics calculation - use latestStatus as fallback
+  const statusValue = record.todayStatus?.status ?? record.latestStatus?.status ?? '';
   const category = categorizeStatus(statusValue);
   return category === filter;
 }

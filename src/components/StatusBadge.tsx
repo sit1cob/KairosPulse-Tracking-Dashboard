@@ -29,7 +29,12 @@ function pickVariant(value: string): Variant {
     return 'default';
   }
 
-  if (normalized.includes('pass') || normalized.includes('success') || normalized.includes('ok')) {
+  if (
+    normalized.includes('pass') ||
+    normalized.includes('success') ||
+    normalized.includes('completed') ||
+    normalized.includes('ok')
+  ) {
     return 'success';
   }
 
@@ -37,7 +42,8 @@ function pickVariant(value: string): Variant {
     normalized.includes('in progress') ||
     normalized.includes('pending') ||
     normalized.includes('running') ||
-    normalized.includes('queued')
+    normalized.includes('queued') ||
+    normalized.includes('started')
   ) {
     return 'warning';
   }

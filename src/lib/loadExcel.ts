@@ -39,7 +39,7 @@ const SHEETS: SheetConfig[] = [
   { key: 'koyfinScripts', name: 'Koyfin Automated Scripts' },
 ];
 
-const BASE_COLUMN_COUNT = 7;
+const BASE_COLUMN_COUNT = 6;
 
 const WORKBOOK_RELATIVE_PATH = path.join(
   'src',
@@ -64,6 +64,7 @@ export type StatusOverrideValue = {
 export type StatusOverrideMap = Record<string, StatusOverrideValue>;
 
 export function loadDashboardData(): DashboardData {
+  console.log('🚀🚀🚀 loadDashboardData called - BASE_COLUMN_COUNT:', BASE_COLUMN_COUNT);
   const workbookPath = resolveWorkbookPath();
 
   if (!workbookPath) {
@@ -198,7 +199,7 @@ function buildRecord({ row, headers, sheetKey, rowIndex, overrides }: BuildRecor
   const schedule = toStringValue(row[3]);
   const estimatedRunTime = toStringValue(row[4]);
   const days = toStringValue(row[5]);
-  const poc = toStringValue(row[6]);
+  const poc = '';
 
   const id = createId(sheetKey, rowIndex, notebook);
   const statuses = collectStatuses(row, headers);
@@ -238,6 +239,9 @@ function collectStatuses(row: unknown[], headers: string[]): StatusEntry[] {
   const entries: StatusEntry[] = [];
   const consumed = new Set<number>();
 
+  console.log(`\n🔍 collectStatuses: Checking ${headers.length - BASE_COLUMN_COUNT} columns starting from index ${BASE_COLUMN_COUNT}`);
+  console.log(`📋 Headers from column ${BASE_COLUMN_COUNT}:`, headers.slice(BASE_COLUMN_COUNT));
+
   for (let columnIndex = BASE_COLUMN_COUNT; columnIndex < headers.length; columnIndex += 1) {
     if (consumed.has(columnIndex)) {
       continue;
@@ -260,11 +264,14 @@ function collectStatuses(row: unknown[], headers: string[]): StatusEntry[] {
       continue;
     }
 
-    entries.push({
+    const entry = {
       label: formatStatusLabel(header),
       status: statusValue,
       remarks: remarksValue,
-    });
+    };
+    
+    console.log(`📊 Collected status: header="${header}", label="${entry.label}", status="${statusValue}"`);
+    entries.push(entry);
 
     consumed.add(columnIndex);
     if (remarksIndex !== -1) {
@@ -272,6 +279,7 @@ function collectStatuses(row: unknown[], headers: string[]): StatusEntry[] {
     }
   }
 
+  console.log(`✅ Total statuses collected: ${entries.length}`);
   return entries;
 }
 
@@ -343,6 +351,7 @@ const MONTH_LOOKUP: Record<string, number> = {
 };
 
 function extractStatusDate(label: string): { day: number; month: number } | null {
+  console.log(`🔍 extractStatusDate: input label="${label}"`);
   const normalized = label.toLowerCase();
 
   const cleaned = normalized
@@ -352,11 +361,15 @@ function extractStatusDate(label: string): { day: number; month: number } | null
     .replace(/[^a-z0-9]+/g, ' ')
     .trim();
 
+  console.log(`  📝 cleaned="${cleaned}"`);
+
   if (!cleaned) {
+    console.log(`  ❌ cleaned is empty`);
     return null;
   }
 
   const parts = cleaned.split(' ').filter(Boolean);
+  console.log(`  📋 parts=`, parts);
   if (parts.length === 0) {
     return null;
   }
@@ -399,9 +412,11 @@ function extractStatusDate(label: string): { day: number; month: number } | null
   }
 
   if (day === null || month === null) {
+    console.log(`  ❌ Failed to parse: day=${day}, month=${month}`);
     return null;
   }
 
+  console.log(`  ✅ Parsed: day=${day}, month=${month}`);
   return { day, month };
 }
 
@@ -436,6 +451,23 @@ function normalizeHeader(header: unknown): string {
     return '';
   }
 
+  // Check if it's an Excel date serial number (typically between 1 and 100000)
+  if (typeof header === 'number' && header > 1 && header < 100000) {
+    // Convert Excel serial date to JavaScript Date
+    // Excel dates start from January 1, 1900 (serial 1)
+    const excelEpoch = new Date(1899, 11, 30); // December 30, 1899
+    const jsDate = new Date(excelEpoch.getTime() + header * 24 * 60 * 60 * 1000);
+    
+    // Format as "DD-MMM" (e.g., "10-Nov")
+    const day = jsDate.getDate();
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const month = monthNames[jsDate.getMonth()];
+    
+    const formatted = `${day}-${month}`;
+    console.log(`📅 Converted Excel date: ${header} → ${formatted}`);
+    return formatted;
+  }
+
   return String(header).trim();
 }
 
@@ -465,11 +497,30 @@ function isStatusHeader(header: string): boolean {
   }
 
   const lower = header.toLowerCase();
+  
+  // Exclude the "Automation Status" column
   if (lower.includes('automation status')) {
+    console.log(`  ⏭️ Skipping automation status column: "${header}"`);
     return false;
   }
 
-  return lower.includes('status');
+  // Include columns that contain "status"
+  if (lower.includes('status')) {
+    console.log(`  ✅ Status column (contains 'status'): "${header}"`);
+    return true;
+  }
+
+  // Include date-based columns (e.g., "10-Nov", "12-Nov", etc.)
+  // Pattern: number followed by hyphen and month name
+  const datePattern = /\d+[-\s](jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/i;
+  const isDateColumn = datePattern.test(header);
+  if (isDateColumn) {
+    console.log(`  ✅ Date-based status column: "${header}"`);
+    return true;
+  }
+
+  console.log(`  ⏭️ Not a status column: "${header}"`);
+  return false;
 }
 
 function isRemarksHeader(header: string): boolean {
